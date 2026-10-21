@@ -34,3 +34,19 @@ func CreateAppTable(db *sql.DB) error {
 
 
 
+func CreateProxyInfoTable(db *sql.DB) error {
+	query := `
+	CREATE TABLE IF NOT EXISTS proxy_info (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		route TEXT NOT NULL,
+		request TEXT NOT NULL,
+		response TEXT,
+		started_at DATETIME NOT NULL,
+		completed_at DATETIME,
+		duration INTEGER NOT NULL,
+		error TEXT
+	);`
+
+	_, err := db.Exec(query)
+	return err
+}
