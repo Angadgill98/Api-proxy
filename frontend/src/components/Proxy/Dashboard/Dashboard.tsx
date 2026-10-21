@@ -1,9 +1,11 @@
-import React from 'react'
+import type { Application } from '../Proxy';
 
-const Dashboard = () => {
+const Dashboard = ({ app }: { app: Application | null }) => {
   return (
-    <div>Dashboard</div>
-  )
-}
+    <div>
+      {app ? app.name : "No application selected"}
+    </div>
+  );
+};
 
-export default Dashboard
+export default Dashboard;

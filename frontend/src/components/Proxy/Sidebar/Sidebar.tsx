@@ -1,6 +1,12 @@
 import React, { useRef, useState } from 'react';
+import type { Application } from '../Proxy';
 
-const Sidebar = () => {
+
+type SidebarProps = {
+  set_current_app: React.Dispatch<React.SetStateAction<Application | null>>;
+};
+
+const Sidebar = ({ set_current_app }: SidebarProps) => {
   let appNameRef = useRef<HTMLInputElement>(null);
   let appUrlRef = useRef<HTMLInputElement>(null);
   let [isDisabled, setIsDisabled] = useState<boolean>(false);
@@ -33,7 +39,7 @@ const Sidebar = () => {
         {applications.length > 0 && (
         <ul>
             {applications.map((app) => (
-                <App_template app={app} />
+                <App_template app={app} set_current_app={set_current_app}/>
             ))}
         </ul>
         )}
@@ -47,17 +53,13 @@ const Sidebar = () => {
 export default Sidebar;
 
 
-type Application = {
-  id: number;
-  name: string;
-  url: string;
-};
 
-
-
-const App_template = ({ app }: { app: Application }) => {
+const App_template = ({app,set_current_app,}: {
+  app: Application;
+  set_current_app: React.Dispatch<React.SetStateAction<Application | null>>;
+}) => {
   return (
-    <li key={app.id}>
+    <li key={app.id} onClick={() => set_current_app(app)}>
       <p>{app.name}</p>
       <p>{app.url}</p>
     </li>
