@@ -1,6 +1,12 @@
 import type { Application } from '../Proxy';
+import type { DashboardClasses } from './Dashboard_classes';
 
-const Dashboard = ({ app }: { app: Application | null }) => {
+interface DashboardProps {
+  app: Application | null;
+  classes: DashboardClasses;
+}
+
+const Dashboard = ({ app, classes }: DashboardProps) => {
   return (
     <div>
       {app ? app.name : "No application selected"}

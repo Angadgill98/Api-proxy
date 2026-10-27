@@ -1,12 +1,14 @@
 import React, { useRef, useState } from 'react';
 import type { Application } from '../Proxy';
+import type { SidebarClasses } from './Sidebar_classes';
 
 
 type SidebarProps = {
   set_current_app: React.Dispatch<React.SetStateAction<Application | null>>;
+  classes: SidebarClasses;
 };
 
-const Sidebar = ({ set_current_app }: SidebarProps) => {
+const Sidebar = ({ set_current_app, classes }: SidebarProps) => {
   let appNameRef = useRef<HTMLInputElement>(null);
   let appUrlRef = useRef<HTMLInputElement>(null);
   let [isDisabled, setIsDisabled] = useState<boolean>(false);
