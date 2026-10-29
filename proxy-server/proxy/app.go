@@ -15,7 +15,7 @@ func (Application)UpdateApp(db *sql.DB, name string, newName string, url string)
 	return err
 }
 
-
+ 
 
 func GetAppByName(db *sql.DB, name string) (*Application, error) {
     query := `SELECT id, name, url FROM application WHERE name = ?`
@@ -27,4 +27,4 @@ func GetAppByName(db *sql.DB, name string) (*Application, error) {
     }
 
     return &app, nil
-}
+}  
