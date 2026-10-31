@@ -27,4 +27,4 @@ func GetAppByName(db *sql.DB, name string) (*Application, error) {
     }
 
     return &app, nil
-}  
+}   
