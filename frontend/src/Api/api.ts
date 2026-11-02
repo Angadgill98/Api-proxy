@@ -136,6 +136,46 @@ class Proxy {
 
         return result;
     }
+
+    async AddListener(app_name: string): Promise<{ success: boolean; response: any }> {
+        const route = "/listeners";
+        const body = { app_name, operation: "add" };
+
+        console.log("Proxy Request:", { route, params: body });
+
+        const res = await fetch(`${this.url}${route}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+
+        const response = await res.json();
+        const result = { success: res.ok, response };
+
+        console.log("Proxy Response:", { route, status: res.status, ...result });
+
+        return result;
+    }
+
+    async RemoveListener(app_name: string): Promise<{ success: boolean; response: any }> {
+        const route = "/listeners";
+        const body = { app_name, operation: "remove" };
+
+        console.log("Proxy Request:", { route, params: body });
+
+        const res = await fetch(`${this.url}${route}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+
+        const response = await res.json();
+        const result = { success: res.ok, response };
+
+        console.log("Proxy Response:", { route, status: res.status, ...result });
+
+        return result;
+    }
 }
 
 export const api = new Api();

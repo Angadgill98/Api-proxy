@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import type { Application } from '../Proxy';
+import type { Application, Listener } from '../Proxy';
 import type { SidebarClasses } from './Sidebar_classes';
 import { api } from '../../../Api/api';
 
@@ -7,9 +7,11 @@ import { api } from '../../../Api/api';
 type SidebarProps = {
   set_current_app: React.Dispatch<React.SetStateAction<Application | null>>;
   classes: SidebarClasses;
+  listeners: Listener[];
+  setlisteners: React.Dispatch<React.SetStateAction<Listener[]>>;
 };
 
-const Sidebar = ({ set_current_app, classes }: SidebarProps) => {
+const Sidebar = ({ set_current_app, classes, listeners, setlisteners }: SidebarProps) => {
   let appNameRef = useRef<HTMLInputElement>(null);
   let appUrlRef = useRef<HTMLInputElement>(null);
   let [isDisabled, setIsDisabled] = useState<boolean>(false);
@@ -83,6 +85,15 @@ const Sidebar = ({ set_current_app, classes }: SidebarProps) => {
 
 
         <p>Active LSiteners</p>
+        <ul>
+            {listeners.map(listener => (
+                <Listener_template
+                    key={listener.app.id}
+                    listener={listener}
+                    set_current_app={set_current_app}
+                />
+            ))}
+        </ul>
     </div>
   );
 };
@@ -132,3 +143,15 @@ const App_template = ({app,set_current_app,}: {
 };
 
 
+
+const Listener_template = ({ listener, set_current_app }: {
+    listener: Listener;
+    set_current_app: React.Dispatch<React.SetStateAction<Application | null>>;
+}) => {
+    return (
+        <li key={listener.app.id} onClick={() => set_current_app(listener.app)}>
+            <p>Name: {listener.app.name}</p>
+            <p>URL: {listener.app.url}</p>
+        </li>
+    );
+};
