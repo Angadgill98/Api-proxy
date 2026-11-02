@@ -11,20 +11,34 @@ import (
 
 var db=global.Db
 
-func SetUpServerRoutes(){
-	http.HandleFunc("/",ProxyPipeline)
 
-	http.HandleFunc("/register-app",RegisterApphandler)
+func SetUpServerRoutes() {
+    http.HandleFunc("/proxy", ProxyPipeline)
+    http.HandleFunc("/register-app", RegisterApphandler)
+	http.HandleFunc("/get-apps", GetAllAppsHandler)
+    http.HandleFunc("/update-app", UpdateApphandler)
+	http.HandleFunc("/delete-app", DeleteAppHandler)
+    http.HandleFunc("/listeners", HandleListeners)
+    http.HandleFunc("/update-req", HandleReqUpdate)
+    http.HandleFunc("/execute-req", HandleExecute)
 
-	http.HandleFunc("/update-app",UpdateApphandler)
+    log.Println("Server listening on :9090")
+    log.Fatal(http.ListenAndServe(":9090", corsMiddleware(http.DefaultServeMux)))
+}
 
-	http.HandleFunc("/listeners",HandleListeners)
+func corsMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-	http.HandleFunc("/update-req",HandleReqUpdate)
+        if r.Method == http.MethodOptions {
+            w.WriteHeader(http.StatusNoContent)
+            return
+        }
 
-	http.HandleFunc("/execute-req",HandleExecute)
-
-	http.ListenAndServe(":9090",nil)
+        next.ServeHTTP(w, r)
+    })
 }
 
 
@@ -55,13 +69,29 @@ func RegisterApphandler(w http.ResponseWriter, req *http.Request) {
 
 	app := Application{Name: params.Name, URL: params.URL}
 
-	if err := app.InsertApp(db, app.Name, app.URL); err != nil {
-		log.Println("RegisterApphandler: failed to insert application:", err)
-		WriteResponse(w, http.StatusInternalServerError, false)
-		return
-	}
+	id, err := app.InsertApp(db, app.Name, app.URL)
+    if err != nil {
+        log.Println("RegisterApphandler: failed to insert application:", err)
+        WriteResponse(w, http.StatusInternalServerError, false)
+        return
+    }
 
-	WriteResponse(w, http.StatusCreated, true)
+    WriteResponse(w, http.StatusCreated, true, map[string]interface{}{
+        "id":   id,
+        "name": app.Name,
+    })
+}
+
+func GetAllAppsHandler(w http.ResponseWriter, req *http.Request) {
+    apps, err := GetAllApps(db)
+    if err != nil {
+		
+        log.Println("GetAllAppsHandler: failed to get applications:", err)
+        WriteResponse(w, http.StatusInternalServerError, false,apps)
+        return
+    }
+
+    WriteResponse(w, http.StatusOK, true, apps)
 }
 
 func UpdateApphandler(w http.ResponseWriter, req *http.Request) {
@@ -82,6 +112,26 @@ func UpdateApphandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	WriteResponse(w, http.StatusOK, true)
+}
+
+func DeleteAppHandler(w http.ResponseWriter, req *http.Request) {
+    var params struct {
+        ID int64 `json:"id"`
+    }
+
+    if err := json.NewDecoder(req.Body).Decode(&params); err != nil {
+        log.Println("DeleteAppHandler: invalid JSON:", err)
+        WriteResponse(w, http.StatusBadRequest, false)
+        return
+    }
+
+    if err := (Application{}).DeleteApp(db, params.ID); err != nil {
+        log.Println("DeleteAppHandler: failed to delete application:", err)
+        WriteResponse(w, http.StatusInternalServerError, false)
+        return
+    }
+
+    WriteResponse(w, http.StatusOK, true)
 }
 
 func HandleListeners(w http.ResponseWriter, req *http.Request) {

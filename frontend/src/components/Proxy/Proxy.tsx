@@ -11,7 +11,7 @@ const Proxy = () => {
         
         <div className='proxy_background'>
             <Sidebar set_current_app={setapp} classes={Sidebar_classes} />
-            <Dashboard app={current_app} classes={Dashboard_classes} />
+            {/* <Dashboard app={current_app} classes={Dashboard_classes} /> */}
         </div>
 
 

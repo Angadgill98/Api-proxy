@@ -1,8 +1,9 @@
-package main
+package db
 
 import (
 	"database/sql"
 	"log"
+	_ "modernc.org/sqlite"
 )
 
 func GetDB() *sql.DB {
@@ -38,13 +39,15 @@ func CreateProxyInfoTable(db *sql.DB) error {
 	query := `
 	CREATE TABLE IF NOT EXISTS proxy_info (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		application_id INTEGER NOT NULL,
 		route TEXT NOT NULL,
 		request TEXT NOT NULL,
 		response TEXT,
 		started_at DATETIME NOT NULL,
 		completed_at DATETIME,
 		duration INTEGER NOT NULL,
-		error TEXT
+		error TEXT,
+		FOREIGN KEY (application_id) REFERENCES application(id)
 	);`
 
 	_, err := db.Exec(query)
